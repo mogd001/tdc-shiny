@@ -1,0 +1,26 @@
+{
+    "id": "0CDC478E",
+    "path": "C:/Users/matto/OneDrive - Tasman District Council/Desktop/Working/R/Shiny/rainfall-app/app.R",
+    "project_path": "app.R",
+    "type": "r_source",
+    "hash": "1725812252",
+    "contents": "",
+    "dirty": false,
+    "created": 1656633323187.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "18,0",
+        "scrollLine": "0"
+    },
+    "folds": "24|85|35|0|\n38|45|51|0|\n",
+    "lastKnownWriteTime": 1657771112,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1657771249125,
+    "read_only": false,
+    "read_only_alternatives": []
+}
