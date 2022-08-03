@@ -1,2 +1,2 @@
 # tdc-shiny
-Repository for TDC R shiny app development.
+Repository for TDC Shiny app development.
