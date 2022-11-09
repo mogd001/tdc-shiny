@@ -21,13 +21,13 @@ site_choices <- append(c("All Sites"), site_choices)
 sites <- get_sites() %>%
   filter(site %in% site_choices)
 
-default_start_date <- ymd("2022-06-01")
+default_start_date <- as.Date(force_tz(now(), tz = "")) - days(7) # Past 7 days
 default_end_date <- as.Date(force_tz(now(), tz = ""))
 
-get_flow_data <- function(from = format(default_start_date, "%Y%m%d"), to = "") {
-  get_data(
+get_flow_data <- function(from = format(default_start_date, "%Y%m%d"), to = "Now") {
+  get_data_collection(
     collection = "ActiveFlowSites", method = "Average",
-    time_interval = NA, from = from, to = "", interval = "1 hour", alignment = "00:00"
+    from = from, to = to, interval = "1 hour"
   ) %>%
     rename(flow = value) %>%
     filter(site %in% site_choices) %>%
@@ -40,8 +40,10 @@ flows <- get_flow_data()
 
 summary <- flows %>%
   group_by(site) %>%
-  summarise(max_flow = max(flow, na.rm = TRUE),
-            mean_flow = mean(flow, na.rm = TRUE))
+  summarise(
+    max_flow = max(flow, na.rm = TRUE),
+    mean_flow = mean(flow, na.rm = TRUE)
+  )
 
 sites <- sites %>%
   left_join(summary, by = "site")
@@ -86,7 +88,8 @@ ui <- fluidPage(
           fluidRow(column(10, leafletOutput("map"))),
           fluidRow(column(12, plotOutput("plot")))
         ),
-        tabPanel("Table",
+        tabPanel(
+          "Table",
           fluidRow(column(12, tableOutput("table")))
         )
       )
@@ -97,8 +100,6 @@ ui <- fluidPage(
 
 # Define server logic ----
 server <- function(input, output, session) {
-
-
   map_data <- reactive({
     # return site data for mapping
     if (input$site == site_choices[1]) { # all sites
@@ -138,11 +139,12 @@ server <- function(input, output, session) {
 
     summary <- x %>%
       group_by(site) %>%
-      summarise(mean_flow = mean(flow, na.rm = TRUE),
-                max_flow = max(flow, na.rm = TRUE))
+      summarise(
+        mean_flow = mean(flow, na.rm = TRUE),
+        max_flow = max(flow, na.rm = TRUE)
+      )
 
     list("flow" = x, "summary" = summary)
-
   })
 
   output$map <- renderLeaflet(basemap(map_data()$sites, map_data()$longitude, map_data()$latitude, map_data()$zoom))

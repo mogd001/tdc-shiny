@@ -1,7 +1,0 @@
-{
-    "installOptions": {
-        "installFromRepository": true,
-        "libraryPath": "C:/Users/matto/OneDrive - Tasman District Council/Documents/R/win-library/4.1",
-        "installDependencies": true
-    }
-}
