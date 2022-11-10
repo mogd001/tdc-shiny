@@ -1,3 +1,0 @@
-rainfall app continued
-  - correct utc datetimes in river and flow apps for date selection
-  - set initial load to last 7 days

@@ -5,9 +5,7 @@ account: tdc-environmental
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 7569277
-bundleId: 6492120
+bundleId: 6496346
 url: https://tdc-environmental.shinyapps.io/rainfall-month-summary-app/
-when: 1667967194.35081
-lastSyncTime: 1667967194.35082
-asMultiple: FALSE
-asStatic: FALSE
+when: 1668039041.90093
+lastSyncTime: 1668039041.90094
