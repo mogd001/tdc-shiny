@@ -170,9 +170,8 @@ server <- function(input, output, session) {
 
       rainfall <- get_rainfall_data_all_sites(sites, from = from, to = to)
       r <- rasterise_rainfall(rainfall, nelsontasman, grid)
-
-      map(generate_rainfall_summary_plot(d, rainfall, r, max_rainfall, nelsontasman, context))
-      map_ly(generate_rainfall_summary_plotly(d, rainfall, r, max_rainfall, nelsontasman, context))
+      map(generate_rainfall_summary_plot(d, rainfall, r, max_rainfall, nelsontasman, context, basemap))
+      map_ly(generate_rainfall_summary_plotly(d, rainfall, r, max_rainfall, nelsontasman, context, basemap))
       y_m(paste0("Monthly Rainfall Summary ", format(d, "%B %Y")))
     })
   })

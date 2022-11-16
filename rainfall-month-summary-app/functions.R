@@ -1,5 +1,3 @@
-library(tibble)
-
 # Define functions
 get_site_data <- function(endpoint = endpoint) {
   get_sites(endpoint = endpoint) %>%
@@ -64,6 +62,7 @@ get_rainfall_data_all_sites <- function(sites, from = "", to = "") {
     subset(site != "Red Hills")
 }
 
+
 rasterise_rainfall <- function(rainfall, nelsontasman, grid) {
   pts <- rainfall %>%
     transmute(
@@ -73,8 +72,9 @@ rasterise_rainfall <- function(rainfall, nelsontasman, grid) {
       y = northing,
       rainfall_total = rainfall_total
     )
-  
-  sp::coordinates(pts) <- ~ x + y
+
+  coordinates(pts) <- ~ x + y
+
   crs(pts) <- CRS("+init=epsg:2193")
   pt_val <- powerTransform(pts$rainfall_total)$lambda
   
@@ -94,7 +94,8 @@ rasterise_rainfall <- function(rainfall, nelsontasman, grid) {
   g <- gstat(g, id = "rainfall_total", model = m.f.rainfall_total, fill.all = T)
   g <- fit.lmc(v.cross, g)
   
-  Sys.sleep(3)
+  Sys.sleep(1)
+
   ck <- stats::predict(g, grid)
   
   k1 <- 1 / pt_val
@@ -203,5 +204,3 @@ generate_rainfall_summary_plotly <- function(month_year, rainfall, rainfall_rast
   
   plot %>% ggplotly(dynamicTicks = TRUE)
 }
-# testing
-#p_ly <- generate_rainfall_summary_plotly(default_date, rainfall, r, max_rainfall, nelsontasman, context)
