@@ -1,0 +1,13 @@
+name: flood-watch-app
+title: flood-watch-app
+username:
+account: tdc-environmental
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 7653169
+bundleId: 6527276
+url: https://tdc-environmental.shinyapps.io/flood-watch-app/
+when: 1668739403.31926
+lastSyncTime: 1668739403.31927
+asMultiple: FALSE
+asStatic: FALSE
