@@ -1,98 +1,99 @@
-library(shiny) # for interactivity
-library(leaflet) # for mapping
+library(shiny)
+library(leaflet)
 library(tidyverse)
 library(lubridate)
 library(tdcR)
+library(plotly)
+library(shinybusy)
+library(config)
+
+source("functions.R")
+
+config <- config::get()
 
 site_choices <- get_collections() %>%
   filter(collection == "ActiveFlowSites") %>%
   arrange(site) %>%
-  pull(site)
+  mutate(
+    site_name = substring(site, 4)
+  ) %>%
+  pull(site_name)
 
 site_choices <- append(c("All Sites"), site_choices)
-
-# site_choices <- c(
-#   "All Sites", "HY Motueka at Gorge", "HY Anatoki at Happy Sams",
-#   "HY Aorere at Devils Boots", "HY Motueka at Woodmans Bend",
-#   "HY Wangapeka at Walter Peak", "HY Tadmor at Mudstone",
-#   "HY Motupiko at Christies", "HY Waimea at TDC Nursery"
-# )
-
-sites <- get_sites() %>%
-  filter(site %in% site_choices)
 
 default_start_date <- as.Date(force_tz(now(), tz = "")) - days(7) # Past 7 days
 default_end_date <- as.Date(force_tz(now(), tz = ""))
 
-get_flow_data <- function(from = format(default_start_date, "%Y%m%d"), to = "Now") {
-  get_data_collection(
-    collection = "ActiveFlowSites", method = "Average",
-    from = from, to = to, interval = "1 hour"
+sites <- get_sites() %>%
+  mutate(
+    site_name = substring(site, 4)
   ) %>%
-    rename(flow = value) %>%
-    filter(site %in% site_choices) %>%
-    group_by(site) %>%
-    slice(-1) %>%
-    ungroup()
-}
+  filter(site_name %in% site_choices)
 
-flows <- get_flow_data()
+flows <- get_flows(format(default_start_date, "%Y%m%d"), "Now")
 
 summary <- flows %>%
   group_by(site) %>%
   summarise(
-    max_flow = max(flow, na.rm = TRUE),
-    mean_flow = mean(flow, na.rm = TRUE)
+    max_flow = max(flow_m3ps, na.rm = TRUE),
+    mean_flow = mean(flow_m3ps, na.rm = TRUE)
   )
 
 sites <- sites %>%
   left_join(summary, by = "site")
 
-# Rainfall basemap function used in shiny app
 basemap <- function(map_data, longitude, latitude, zoom) {
-  # build LINZ URL template for map background
   tPrefix <- "http://tiles-a.data-cdn.linz.govt.nz/services;key="
-  key <- "5ede30255f754cee9fb2c53963274636" # my LINZ web service key
+  key <- config$linzkey
   tMid <- "/tiles/v4/layer="
   tSuffix <- "/EPSG:3857/{z}/{x}/{y}.png"
-  # NZ Topo250 (layer id = 798)
-  Topo250_template <- paste0(tPrefix, key, tMid, 798, tSuffix)
 
+  Topo50_template <- paste0(tPrefix, key, tMid, 50767, tSuffix)
   leaflet(map_data) %>%
-    # increase zoom to zoom in
     setView(longitude, latitude, zoom) %>%
-    # add LINZ layer
-    addTiles(urlTemplate = Topo250_template, group = "NZ Topo250")
+    addTiles(urlTemplate = Topo50_template, group = "NZ Topo50")
 }
 
 # Define UI ----
 ui <- fluidPage(
-  titlePanel("Flow App"),
+  tags$head(
+    tags$link(rel = "stylesheet", type = "text/css", href = "custom.css")
+  ),
+  titlePanel(h1(id = "title-panel", "Flow App"), "Flow App"),
   sidebarLayout(
     sidebarPanel(
-      img(src = "tdc_logo.png", width = 250),
+      id = "sidebar",
+      span(tags$a(img(src = "tdc_logo.png", width = 250), href = "https://www.tasman.govt.nz/", target = "_blank")),
       br(),
-      em("developed by Matt Ogden (July 2022)"),
+      h3(id = "side-bar-title", "Flow App"),
+      em(id = "version", "v0.1"),
+      br(),
+      em(id = "developed-by", "developed by Matt Ogden (November 2022)"),
       h3("Information"),
       p("The purpose of this app is to visualise flow data managed by the TDC Hydrology team for various sites around the Tasman region."),
       p("Minimum date is: 2020-01-01."),
       br(),
       selectInput("site", "Select site", site_choices, selected = site_choices[1]),
-      dateInput("start_date", "Select start date", value = "2022-06-01", min = "2020-01-01", max = default_end_date),
-      dateInput("end_date", "Select end date", value = default_end_date, max = default_end_date)
+      dateInput("start_date", "Select start date", value = default_start_date, min = "2020-01-01", max = default_end_date),
+      dateInput("end_date", "Select end date", value = default_end_date, max = default_end_date),
+      width = 2
     ),
     mainPanel(
+      id = "main",
       tabsetPanel(
         tabPanel(
           "Dashboard",
-          fluidRow(column(10, leafletOutput("map"))),
-          fluidRow(column(12, plotOutput("plot")))
+          fluidRow(id = "mapoutput", column(12, leafletOutput("map", height = 800))),
+          br(),
+          fluidRow(column(12, plotlyOutput("plot")))
         ),
         tabPanel(
           "Table",
           fluidRow(column(12, tableOutput("table")))
         )
-      )
+      ),
+      add_busy_spinner(spin = "fading-circle"),
+      height = 30
     )
   )
 )
@@ -100,23 +101,25 @@ ui <- fluidPage(
 
 # Define server logic ----
 server <- function(input, output, session) {
+  flows <- reactiveVal(flows)
+
   map_data <- reactive({
     # return site data for mapping
     if (input$site == site_choices[1]) { # all sites
       list("sites" = sites, "longitude" = 173.1, "latitude" = -41.4, "zoom" = 9)
     } else {
       x <- sites %>%
-        filter(site == input$site) %>%
+        filter(site_name == input$site) %>%
         head(1)
+
+      print(x)
 
       list("sites" = sites, "longitude" = x$longitude, "latitude" = x$latitude, "zoom" = 11)
     }
   })
 
-  flows <- reactiveVal(flows)
-
   flow_data <- reactive({
-    # return summary data for plotting, update flow data through the process
+    # return summary data for plotting, update flow data through the process.
     curr_min_date <- min(flows()$day)
     curr_max_date <- max(flows()$day)
 
@@ -124,8 +127,13 @@ server <- function(input, output, session) {
     input_end_date <- force_tz(input$end_date, "NZ")
 
     if (input_start_date < curr_min_date) {
-      updated_flows <- get_flow_data(from = format(input_start_date, "%Y%m%d"), to = "")
-      flows(updated_flows)
+      if (input$end_date == default_end_date) {
+        updated_flows <- get_flows(from = format(input_start_date, "%Y%m%d"), to = "Now")
+        flows(updated_flows)
+      } else {
+        updated_flows <- get_flows(from = format(input_start_date, "%Y%m%d"), to = format(input_end_date, "%Y%m%d"))
+        flows(updated_flows)
+      }
     }
 
     # filter displayed flow to between input start date and input end date
@@ -134,14 +142,14 @@ server <- function(input, output, session) {
         filter(date >= input_start_date & date <= input_end_date)
     } else {
       x <- flows() %>%
-        filter(site == input$site & date >= input_start_date & date <= input_end_date)
+        filter(site_name == input$site & date >= input_start_date & date <= input_end_date)
     }
 
     summary <- x %>%
-      group_by(site) %>%
+      group_by(site_name) %>%
       summarise(
-        mean_flow = mean(flow, na.rm = TRUE),
-        max_flow = max(flow, na.rm = TRUE)
+        mean_flow = mean(flow_m3ps, na.rm = TRUE),
+        max_flow = max(flow_m3ps, na.rm = TRUE)
       )
 
     list("flow" = x, "summary" = summary)
@@ -157,26 +165,24 @@ server <- function(input, output, session) {
       addCircles(
         lng = ~longitude, lat = ~latitude,
         weight = 2, color = "black", fillColor = "blue",
-        opacity = 0.9, fillOpacity = 0.7,
-        radius = 500,
-        label = ~site, # ~as.character(flow_disp)
+        opacity = 1, fillOpacity = 0.7,
+        radius = 1000,
+        label = ~site_name,
         labelOptions = labelOptions(
-          textsize = "8px",
+          textsize = "18px",
           opacity = 0.9,
           noHide = FALSE
         )
       )
   })
 
-  output$plot <- renderPlot(
-    {
-      ggplot(flow_data()$flow) +
-        geom_line(aes(datetime, flow, color = site), alpha = 0.5) +
-        theme_bw() +
-        labs(x = "Datetime (NZST)", y = "Flow (m3/s)", color = "Site", title = "Flow Summary", subtitle = "Flow for all sites or single selected site")
-    },
-    res = 96
-  )
+  output$plot <- renderPlotly({
+    p <- ggplot(flow_data()$flow) +
+      geom_line(aes(datetime, flow_m3ps, color = site_name), alpha = 0.5) +
+      theme_bw() +
+      labs(x = "Datetime (NZST)", y = "Flow (m3/s)", color = "Site", title = "Flow Summary")
+    ggplotly(p)
+  })
 
   output$table <- renderTable(flow_data()$summary)
 }
