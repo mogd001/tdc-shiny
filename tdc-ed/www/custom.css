@@ -1,0 +1,27 @@
+#title-panel {
+    background-color: #273691;
+    color: #ffffff;
+    font-size: 24px;
+    font-style: bold;
+    padding: 10px;
+    text-align: center;
+    width: 100%;
+}
+#main {
+    background-color: #ffffff;
+    border: 1px double #ffffff;
+    border-radius: 0px;
+    text-align: center;
+    width: 100%;
+}
+
+a {
+  color: #273691;
+  font-weight: bold;
+  font-size: 30px; 
+}
+a:hover {
+  color: #000000;
+  font-weight: bold;
+  font-size: 30px; 
+}

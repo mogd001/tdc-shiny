@@ -1,0 +1,13 @@
+name: tdc-ed
+title: tdc-ed
+username:
+account: tdc-environmental
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 7700532
+bundleId: 6552096
+url: https://tdc-environmental.shinyapps.io/tdc-ed/
+when: 1669328377.56081
+lastSyncTime: 1669328377.56082
+asMultiple: FALSE
+asStatic: FALSE
