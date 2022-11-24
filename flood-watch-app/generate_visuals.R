@@ -114,9 +114,9 @@ generate_rainfall_summary_plot <- function(r, sites) {
       event_rainfall_total = round(sum(rainfall_total_mm, na.rm = TRUE), 0),
       event_max_hrly_rainfall = round(max(rainfall_total_mm, na.rm = TRUE), 0)
     ) %>% 
-    left_join(select(sites, c(site, catchment)), by = "site")
+    left_join(select(sites, c(site, catchment, site_name)), by = "site")
   
-  ggplot(r_summary, aes(x = reorder(site, -event_rainfall_total), y = event_rainfall_total, fill = catchment)) +
+  ggplot(r_summary, aes(x = reorder(site_name, -event_rainfall_total), y = event_rainfall_total, fill = catchment)) +
     geom_bar(color = "black", alpha = 0.6, stat = "identity") +
     theme_bw() +
     labs(x = "", y = "Rainfall Total (mm)", fill = "Catchment", title = "Rainfall Total by Site") + #caption = glue("at {now_plot})"

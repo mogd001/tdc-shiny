@@ -11,7 +11,7 @@ source("functions.R")
 source("load_data.R")
 source("generate_visuals.R")
 
-default_date <- as.Date(now(), tz ="")
+default_date <- as.Date(now(), tz = "")
 
 start_date <- default_date - days(3)
 end_date <- default_date
@@ -75,13 +75,13 @@ ui <- dashboardPage(
     h3(id = "information", "Information"),
     p(id = "purpose", "The purpose of this app is to support flood response in the Tasman Region."),
     airDatepickerInput("start_date", "Start",
-                       value = default_date - days(3),
-                       maxDate = end_date, dateFormat = "yyyy MM dd", view = "days",  minView = "days",
+                       value = force_tz(default_date, tz = "NZ") - days(3),
+                       maxDate = force_tz(end_date, tz = "NZ"), dateFormat = "yyyy MM dd", view = "days",  minView = "days",
                        autoClose = TRUE
     ),
     airDatepickerInput("end_date", "End",
-                       value = default_date,
-                       maxDate = default_date, dateFormat = "yyyy MM dd", view = "days",  minView = "days",
+                       value = force_tz(default_date, tz = "NZ"),
+                       maxDate = force_tz(default_date, tz = "NZ"), dateFormat = "yyyy MM dd", view = "days",  minView = "days",
                        autoClose = TRUE
     ),
     pickerInput("catchment", "Catchment",
@@ -96,7 +96,7 @@ ui <- dashboardPage(
     pickerInput("rainfall_site", "Rainfall site",
                 choices = rainfall_sites, selected = NULL, multiple = TRUE,
                 options = list(
-                  `actions-box` = TRUE,
+                  `actions-box` = FALSE,
                   `deselect-all-text` = "Clear",
                   `select-all-text` = "All",
                   `none-selected-text` = "No rainfall site selected",
@@ -107,7 +107,7 @@ ui <- dashboardPage(
     pickerInput("flow_site", "Flow site",
                 choices = flow_sites, selected = NULL, multiple = TRUE,
                 options = list(
-                  `actions-box` = TRUE,
+                  `actions-box` = FALSE,
                   `deselect-all-text` = "Clear",
                   `select-all-text` = "All",
                   `none-selected-text` = "No flow site selected",
