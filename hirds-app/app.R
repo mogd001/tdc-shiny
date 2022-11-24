@@ -27,11 +27,12 @@ p <- ggplot()
 # Other data components ----
 nz_record <- tribble(
   ~duration, ~value,
-  0.1, 20,
-  1, 100,
-  10, 500,
-  40, 1000,
-  100, 1500
+  1/6, 34,
+  1, 134,
+  12, 566,
+  24, 758,
+  48, 1086,
+  120, 1368
 )
 
 duraction_text_to_val <- tribble(
