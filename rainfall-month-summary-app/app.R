@@ -67,11 +67,11 @@ sites <- bind_rows(tdc_sites, mdc_sites, wgrs_sites)
 from <- format(default_date, "%Y%m%d")
 to <- format(default_date + months(1), "%Y%m%d")
 
-rainfall <- get_rainfall_data_all_sites(sites, from, to)
-r <- rasterise_rainfall(rainfall, nelsontasman, grid)
-map <- generate_rainfall_summary_plot(default_date, rainfall, r, max_rainfall, nelsontasman, context, basemap)
-map_ly <- generate_rainfall_summary_plotly(default_date, rainfall, r, max_rainfall, nelsontasman, context, basemap)
-y_m <- paste0("Monthly Rainfall Summary ", format(default_date, "%B %Y"))
+#rainfall <- get_rainfall_data_all_sites(sites, from, to)
+#r <- rasterise_rainfall(rainfall, nelsontasman, grid)
+map <- ggplot() #generate_rainfall_summary_plot(default_date, rainfall, r, max_rainfall, nelsontasman, context, basemap)
+map_ly <- ggplotly() #generate_rainfall_summary_plotly(default_date, rainfall, r, max_rainfall, nelsontasman, context, basemap)
+y_m <- "" #paste0("Monthly Rainfall Summary ", format(default_date, "%B %Y"))
 
 
 # ui----
@@ -79,7 +79,7 @@ ui <- fluidPage(
   tags$head(
     tags$link(rel = "stylesheet", type = "text/css", href = "custom.css")
   ),
-  titlePanel(h1(id = "title-panel", "TDC Environmental Data"), "TDC Environmental Data"),
+  titlePanel(h1(id = "title-panel", "Rainfall Summary App"), "Rainfall Summary App"),
   sidebarLayout(
     sidebarPanel(
       id = "sidebar",
@@ -117,16 +117,6 @@ ui <- fluidPage(
           plotOutput("map", height = 600)
         )
       ),
-      # fluidRow(
-      #   column(
-      #     6,
-      #     plotOutput("plot", width = "auto")
-      #   ),
-      #   column(
-      #     6,
-      #     plotOutput("plot2", width = "auto")
-      #   )
-      # ),
       add_busy_spinner(spin = "fading-circle"),
       height = 30
     )
