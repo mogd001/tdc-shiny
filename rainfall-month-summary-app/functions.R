@@ -140,7 +140,7 @@ generate_rainfall_summary_plot <- function(month_year, rainfall, rainfall_raster
     geom_point(pts, mapping = aes(x = longitude, y = latitude), size = 1.5, alpha = 0.4, color = "black", shape = 3) +
     geom_text(pts, mapping = aes(x = longitude, y = latitude, label = round(rainfall_total, 0)), color = "black", hjust = -0.25, vjust = -0.25, size = 2.5) + # fontface = "bold"
     coord_sf(xlim = c(bb$xmin - 0.3, bb$xmax + 0.2), ylim = c(bb$ymin - 0.2, bb$ymax + 0.2)) +
-    labs(fill = "Rainfall Total (mm)") + #, title = glue('Monthly Rainfall Summary {format(month_year, "%B %Y")}')) +
+    labs(fill = "Rainfall Total (mm)",  title = glue('Monthly Rainfall Summary {format(month_year, "%B %Y")}')) +
     theme_bw() +
     scale_color_viridis(option = "turbo", limits = c(0, max_rainfall), alpha = 0.7) +
     scale_fill_viridis(option = "turbo", limits = c(0, max_rainfall), na.value = "transparent", alpha = 0.7) +

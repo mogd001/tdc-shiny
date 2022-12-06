@@ -34,8 +34,8 @@ register_google(key = "AIzaSyBEj-P3pT3wWs9UazXX0ccrl5XzRO8MvM0")
 # has_google_key()
 
 # Set defaults and load initial data
-default_month <- month(as.Date(now()) - months(1))
-deafult_year <- year(as.Date(now()) - months(1))
+default_month <- month(as.Date(now(), tz = "NZ") - months(1))
+deafult_year <- year(as.Date(now(), tz = "NZ") - months(1))
 default_date <- ym(paste0(deafult_year, "-", default_month))
 default_ym_display <- format(default_date, "%Y %B")
 max_rainfall <- 1000
@@ -67,11 +67,11 @@ sites <- bind_rows(tdc_sites, mdc_sites, wgrs_sites)
 from <- format(default_date, "%Y%m%d")
 to <- format(default_date + months(1), "%Y%m%d")
 
-#rainfall <- get_rainfall_data_all_sites(sites, from, to)
-#r <- rasterise_rainfall(rainfall, nelsontasman, grid)
-map <- ggplot() #generate_rainfall_summary_plot(default_date, rainfall, r, max_rainfall, nelsontasman, context, basemap)
-map_ly <- ggplotly() #generate_rainfall_summary_plotly(default_date, rainfall, r, max_rainfall, nelsontasman, context, basemap)
-y_m <- "" #paste0("Monthly Rainfall Summary ", format(default_date, "%B %Y"))
+# rainfall <- get_rainfall_data_all_sites(sites, from, to)
+# r <- rasterise_rainfall(rainfall, nelsontasman, grid)
+map <- ggplot() # generate_rainfall_summary_plot(default_date, rainfall, r, max_rainfall, nelsontasman, context, basemap)
+map_ly <- ggplotly() # generate_rainfall_summary_plotly(default_date, rainfall, r, max_rainfall, nelsontasman, context, basemap)
+y_m <- "" # paste0("Monthly Rainfall Summary ", format(default_date, "%B %Y"))
 
 
 # ui----
@@ -86,15 +86,15 @@ ui <- fluidPage(
       span(tags$a(img(src = "tdc_logo.png", width = 200), href = "https://www.tasman.govt.nz/", target = "_blank")),
       br(),
       h3(id = "side-bar-title", "Rainfall Monthly Summary"),
-      em(id = "version", "v0.1"),
+      em(id = "version", "v0.2"),
       br(),
-      em(id = "developed-by", "developed by Matt Ogden (November 2022)"),
+      em(id = "developed-by", "developed by TDC Environmental Data (November 2022)"),
       h3("Information"),
       p("The purpose of this app is to summarise monthly rainfall totals for the Top of the South."),
       br(),
       airDatepickerInput("date_input", "Year month",
         value = default_date,
-        maxDate = default_date, dateFormat = "yyyy MMMM", view = "months",  minView = "months",
+        maxDate = default_date, dateFormat = "yyyy MMMM", view = "months", minView = "months",
         autoClose = TRUE
       ),
       actionButton("actionbutton", "Update"),
@@ -109,16 +109,22 @@ ui <- fluidPage(
       ),
       fluidRow(
         column(
-          6, style = "padding: 0px 0px;",
+          6,
+          style = "padding: 0px 0px;",
           plotlyOutput("map_interactive", height = 600)
         ),
         column(
-          6, style = "padding: 0px 0px;height: 600px",
+          6,
+          style = "padding: 0px 0px;height: 600px",
           plotOutput("map", height = 600)
         )
       ),
-      add_busy_spinner(spin = "fading-circle"),
-      height = 30
+      add_busy_spinner(
+        spin = "breeding-rhombus",
+        position = "top-left",
+        height = 30,
+        margins = c("100px", "400px")
+      )
     )
   )
 )
@@ -134,19 +140,29 @@ server <- function(input, output, session) {
     y_m()
   })
 
-  output$map_interactive <- renderPlotly(
-    {
-      map_ly()
-    })
-  
+  output$map_interactive <- renderPlotly({
+    validate(
+      need(y_m() != "", "Select Year month and press Update.")
+    )
+
+    map_ly()
+  })
+
   output$map <- renderPlot(
     {
+      validate(
+        need(y_m() != "", "Select Year month and press Update.")
+      )
+
       map()
-    }, width = 600, res = 75)
-  
+    },
+    width = 600,
+    res = 75
+  )
+
   # output$plot <- renderPlot({ggplot()})
   # output$plot2 <- renderPlot({ggplot()})
-  
+
   observeEvent(input$actionbutton, {
     isolate({
       d <- ymd(substr(input$date_input[1], 1, 10))
@@ -172,7 +188,7 @@ server <- function(input, output, session) {
     },
     contentType = "image/jpeg",
     content = function(file) {
-      ggsave(file, plot = map(), device = "png", width = 6.2, height = 9.085, dpi = 300)
+      ggsave(file, plot = map(), device = "png", width = 6.3, height = 9.085, dpi = 300)
     }
   )
 }
