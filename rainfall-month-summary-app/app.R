@@ -1,6 +1,7 @@
 library(shiny)
 library(shinyWidgets)
 library(shinybusy)
+library(shinytitle)
 
 library(leaflet)
 library(leaflet.opacity)
@@ -76,6 +77,9 @@ y_m <- "" # paste0("Monthly Rainfall Summary ", format(default_date, "%B %Y"))
 
 # ui----
 ui <- fluidPage(
+  title = "Rainfall Summary",
+  use_shiny_title(),
+  busy_window_title(),
   tags$head(
     tags$link(rel = "stylesheet", type = "text/css", href = "custom.css")
   ),
