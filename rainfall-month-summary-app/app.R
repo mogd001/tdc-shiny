@@ -79,16 +79,16 @@ ui <- fluidPage(
   tags$head(
     tags$link(rel = "stylesheet", type = "text/css", href = "custom.css")
   ),
-  titlePanel(h1(id = "title-panel", "Rainfall Summary App"), "Rainfall Summary App"),
+  h1(id = "title-panel", "Rainfall Summary App"),
   sidebarLayout(
     sidebarPanel(
       id = "sidebar",
-      span(tags$a(img(src = "tdc_logo.png", width = 200), href = "https://www.tasman.govt.nz/", target = "_blank")),
+      span(tags$a(img(src = "tdc_logo.png", width = "100%"), href = "https://www.tasman.govt.nz/", target = "_blank")),
       br(),
       h3(id = "side-bar-title", "Rainfall Monthly Summary"),
-      em(id = "version", "v0.2"),
+      em(id = "version", "v0.21"),
       br(),
-      em(id = "developed-by", "developed by TDC Environmental Data (November 2022)"),
+      em(id = "developed-by", "developed by TDC Environmental Data (last updated January 2023)"),
       h3("Information"),
       p("The purpose of this app is to summarise monthly rainfall totals for the Top of the South."),
       br(),
@@ -123,7 +123,7 @@ ui <- fluidPage(
         spin = "breeding-rhombus",
         position = "top-left",
         height = 30,
-        margins = c("100px", "400px")
+        margins = c("50%", "50%")
       )
     )
   )

@@ -19,6 +19,7 @@ get_rainfall_monthly_data <- function(endpoint = endpoint, collection = "Rainfal
     from = from, to = to
   ) %>%
     rename(rainfall_total = value) %>%
+    mutate(month = month(datetime, label = TRUE)) %>% 
     group_by(site) %>%
     arrange(site, datetime) %>%
     # slice(-1) %>% # remove first row due to offset, datetime refers to start of interval.
