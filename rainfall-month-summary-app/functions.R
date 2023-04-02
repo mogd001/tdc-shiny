@@ -15,17 +15,15 @@ get_site_data <- function(endpoint = endpoint) {
 
 get_rainfall_monthly_data <- function(endpoint = endpoint, collection = "Rainfall", from = "", to = "", month = "") {
   get_data_collection(
-    endpoint = endpoint, collection = collection, method = "Total", interval = "1 months",
+    endpoint = endpoint, collection = collection, method = "Total", interval = "1 month",
     from = from, to = to
   ) %>%
     rename(rainfall_total = value) %>%
     mutate(month = month(datetime, label = TRUE)) %>% 
     group_by(site) %>%
     arrange(site, datetime) %>%
-    # slice(-1) %>% # remove first row due to offset, datetime refers to start of interval.
     ungroup() %>%
     mutate(
-      interval = months(1),
       rainfall_total = round(rainfall_total, digits = 2)
     ) %>%
     filter(!is.na(rainfall_total)) %>%
@@ -44,9 +42,11 @@ get_rainfall_data_all_sites <- function(sites, from = "", to = "") {
   mdc_endpoint <- "http://hydro.marlborough.govt.nz/mdc data.hts?"
   wgrc_endpoint <- "http://hilltop.wcrc.govt.nz/Websitedata.hts?"
   
-  tdc_month_rainfall <- get_rainfall_monthly_data(endpoint = tdc_endpoint, collection = "Rainfall", from = from, to = to, month = format(ymd(from), "%b"))
-  mdc_month_rainfall <- get_rainfall_monthly_data(endpoint = mdc_endpoint, collection = "Rainfall2", from = from, to = to, month = format(ymd(from), "%b"))
-  wgrs_month_rainfall <- get_rainfall_monthly_data(endpoint = wgrc_endpoint, collection = "WebRainfall", from = from, to = to, format(ymd(from), "%b"))
+  month_select <- format(ymd(to), "%b")
+  
+  tdc_month_rainfall <- get_rainfall_monthly_data(endpoint = tdc_endpoint, collection = "AllRainfall", from = from, to = to, month = month_select)
+  mdc_month_rainfall <- get_rainfall_monthly_data(endpoint = mdc_endpoint, collection = "Rainfall2", from = from, to = to, month = month_select)
+  wgrs_month_rainfall <- get_rainfall_monthly_data(endpoint = wgrc_endpoint, collection = "WebRainfall", from = from, to = to, month = month_select)
   
   month_rainfall <- dplyr::bind_rows(tdc_month_rainfall, mdc_month_rainfall, wgrs_month_rainfall) %>%
     dplyr::select(-c(month, rainfall_med_total)) %>%
