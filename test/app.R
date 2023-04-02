@@ -1,46 +1,37 @@
-library(shinydashboard)
+library(shiny)
+library(shinyWidgets)
 
-header <- dashboardHeader()
+first <- 10
+second <- 100
 
-sidebar <- dashboardSidebar(
-  sidebarUserPanel("User Name",
-                   subtitle = a(href = "#", icon("circle", class = "text-success"), "Online"),
-                   # Image file should be in www/ subdir
-                   image = "userimage.png"
-  ),
-  sidebarSearchForm(label = "Enter a number", "searchText", "searchButton"),
-  sidebarMenu(
-    # Setting id makes input$tabs give the tabName of currently-selected tab
-    id = "tabs",
-    menuItem("Dashboard", tabName = "dashboard", icon = icon("dashboard")),
-    menuItem("Widgets", icon = icon("th"), tabName = "widgets", badgeLabel = "new",
-             badgeColor = "green"),
-    menuItem("Charts", icon = icon("bar-chart-o"),
-             menuSubItem("Sub-item 1", tabName = "subitem1"),
-             menuSubItem("Sub-item 2", tabName = "subitem2")
-    )
+ui <- fluidPage(
+  actionButton("first", label = "First"),  
+  actionButton("second", label = "Second"),
+  verbatimTextOutput("result"),
+  
+  radioGroupButtons(
+    inputId = "Id062",
+    direction = "vertical",
+    label = "Label",
+    choices = c("A", 
+                "B", "C")
   )
+  
 )
 
-body <- dashboardBody(
-  tabItems(
-    tabItem("dashboard",
-            div(p("Dashboard tab content"))
-    ),
-    tabItem("widgets",
-            "Widgets tab content"
-    ),
-    tabItem("subitem1",
-            "Sub-item 1 tab content"
-    ),
-    tabItem("subitem2",
-            "Sub-item 2 tab content"
-    )
-  )
-)
+server <- function(input, output, session) {
+  results <- reactiveVal(0)
+  
+  observeEvent(input$first, {
+    print(paste("Add",first))
+    results(results() + first)
+  })  
+  
+  observeEvent(input$second, {
+    print(paste("Add",second))
+    results(results() + second)
+  })
+  output$result <- renderText(paste0("Result: ",as.character(results())))
+}
 
-shinyApp(
-  ui = dashboardPage(header, sidebar, body),
-  server = function(input, output) { }
-)
-
+shinyApp(ui = ui, server = server)
