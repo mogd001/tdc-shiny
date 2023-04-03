@@ -89,7 +89,7 @@ ui <- fluidPage(
       span(tags$a(img(src = "tdc_logo.png", width = "100%"), href = "https://www.tasman.govt.nz/", target = "_blank")),
       br(),
       h3(id = "side-bar-title", "Rainfall Monthly Summary"),
-      em(id = "version", "v0.212"),
+      em(id = "version", "v0.22"),
       br(),
       em(id = "developed-by", "developed by TDC Environmental Data (last updated 3/04 April 2023)"),
       h3("Information"),
