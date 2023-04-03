@@ -58,7 +58,7 @@ ui <- fluidPage(
   tags$head(
     tags$link(rel = "stylesheet", type = "text/css", href = "custom.css")
   ),
-  titlePanel(h1(id = "title-panel", "Hirds App"), "Hirds App"),
+  h1(id = "title-panel", "Hirds App"),
   sidebarLayout(
     sidebarPanel(
       id = "sidebar",
