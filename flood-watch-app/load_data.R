@@ -12,7 +12,7 @@ catchments <- st_read("data/context.gpkg", layer = "catchments") %>%
   mutate(catchment = replace(catchment, catchment == "Other", "Motueka"))
 
 # Sites
-z <- get_sites(synonyms = TRUE) %>%
+sites <- get_sites(synonyms = TRUE) %>%
   mutate(
     longitude_ = longitude,
     latitude_ = latitude
@@ -22,7 +22,15 @@ z <- get_sites(synonyms = TRUE) %>%
   mutate(
     easting = st_coordinates(.)[, "X"],
     northing = st_coordinates(.)[, "Y"],
-    site_name = substring(site, 4)
+    site_name = second_synonym
   ) %>% 
   st_join(catchments, join = st_intersects) %>%
-  replace_na(list(catchment = "Motueka"))
+  replace_na(list(catchment = "Motueka")) %>% 
+  st_transform(crs = 4326)
+
+catchments <- catchments %>% st_transform(crs = 4326)
+catchment_centroids <- catchments %>% st_centroid(catchments)
+
+# Rivers
+rivers <- st_read("data/context.gpkg", layer = "rivers") %>%
+  st_transform(crs = 4326)

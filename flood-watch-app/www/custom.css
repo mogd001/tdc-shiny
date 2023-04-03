@@ -1,3 +1,4 @@
+/* Gemeral dashboard elements */
 .skin-blue body > div {
   max-width: 1200px;
 }
@@ -26,8 +27,8 @@
   color: #ffffff;
 }
 #sidebarItemExpanded {
-  background-color:#222D32;
-  color:#ffffff;
+  background-color: #222D32;
+  color: #ffffff;
   margin-left: 10px;
   padding-top: 10px;
   padding-left: 0px;
@@ -62,6 +63,7 @@ i.fa.fa-calendar-days {
 .inner.open {
   max-height: 200px !important; 
 }
+/* Sidebar elements */
 #update {
   margin-left: 10px;
   padding-top: 5px;
@@ -75,4 +77,44 @@ i.fa.fa-calendar-days {
   padding-left: 10px;
   padding-bottom: 5px;
   padding-right: 10px;
+}
+/* Body elements */
+.row{
+  margin-right: 0px;
+  margin-left: 0px;
+}
+.content {
+  padding: 0px;
+}
+.col-sm-6 {
+  padding-top: 10px;
+  padding-left: 10px;
+  padding-bottom: 10px;
+  padding-right: 10px;
+}
+#map-title {
+  height: 48px;
+  line-height: 48px;
+  color: #ffffff;
+  background-color: #222D32;
+  font-size: 30px;
+  text-align: center;
+}
+#map {
+  padding-top: 2px;
+}
+
+#col2 {
+  padding-top: 10px;
+  padding-left: 10px;
+  padding-bottom: 10px;
+  padding-right: 10px;
+}
+.nav-tabs{
+  height: 50px;
+  padding-bottom: 2px;
+}
+.tab-content {
+  height: 400px;
+  padding-bottom: 10px;
 }

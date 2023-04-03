@@ -25,7 +25,9 @@ catchment_names <- levels(sites$catchment)
 flow_sites <- unique(flows$site_name)
 rainfall_sites <- unique(rainfall$site_name)
 
-map <- generate_catchment_map(catchments, sites, flow_sites, rainfall_sites)
+flow_thresholds <- read_csv("data/20230402_flow_thresholds.csv")
+
+map <- generate_map(catchments, sites, flow_sites, rainfall_sites)
 p_rainsummary <- generate_rainfall_summary_plot(rainfall, sites)
 p_flowrain <- NULL
 
@@ -69,11 +71,11 @@ ui <- dashboardPage(
   dashboardSidebar(
     width = 350,
     h3(id = "side-bar-title", "Flood Watch Portal"),
-    em(id = "version", "v0.1 - November (2022)"),
+    em(id = "version", "v0.2"),
     br(),
-    em(id = "developed-by", "developed by TDC Environmental Data"),
+    em(id = "developed-by", "developed by TDC Environmental Data (last updated 3/04 April 2023)"),
     h3(id = "information", "Information"),
-    p(id = "purpose", "The purpose of this app is to support flood response in the Tasman Region."),
+    p(id = "purpose", "The purpose of this app is to support TDC Flood Warning functions."),
     airDatepickerInput("start_date", "Start",
                        value = force_tz(default_date, tz = "NZ") - days(3),
                        maxDate = force_tz(end_date, tz = "NZ"), dateFormat = "yyyy MM dd", view = "days",  minView = "days",
@@ -126,30 +128,30 @@ ui <- dashboardPage(
       tags$link(rel = "stylesheet", type = "text/css", href = "custom.css")
     ),
     fluidRow(
-      column(6,
-        plotlyOutput("map"),
-        br(),
-        plotOutput("rainfall_summary_plot"),
+      column(6, id = 'col1', 
+        div(id = "map-title", "Map"),
+        leafletOutput("map", height = "800px"),
       ),
-      column(6,
-         plotOutput("plot"),
-         br(),
+      column(6, id = 'col2', 
          tabsetPanel(
-           tabPanel("Rainfall", dataTableOutput('rainfall_table')),
-           tabPanel("Flow", dataTableOutput('flow_table'))
-         )
+           tabPanel("Rainfall Summary", plotOutput("rainfall_summary_plot"), height = "400px"),
+           tabPanel("Rainfall Table", dataTableOutput('rainfall_table'),  height = "400px"),
+           tabPanel("Flow Table", dataTableOutput('flow_table'),  height = "400px")
+         ),
+         plotOutput("plot",  height = "400px"),
       )
     ), 
     add_busy_spinner(#spin = "fading-circle",
       spin = "breeding-rhombus",
       position = "top-left",
       height = 30,
-      margins = c("100px", "400px")
+      margins = c("130px", "400px")
     )
   )
 )
 
-# Server logic
+
+# Server
 server <- function(input, output, session) {
   start_date <- reactiveVal(start_date)
   end_date <- reactiveVal(end_date)
@@ -238,7 +240,7 @@ server <- function(input, output, session) {
       if (!is.null(input$rainfall_site)) {
         rainfall_sites <- input$rainfall_site
       }
-      map(generate_catchment_map(catchments, sites, flow_sites, rainfall_sites))
+      map(generate_map(catchments, sites, flow_sites, rainfall_sites))
       
       if (!is.null(input$rainfall_site)) {
         rainfall(subset(rainfall(), site_name == input$rainfall_site))
@@ -247,14 +249,14 @@ server <- function(input, output, session) {
           
       if (!is.null(input$rainfall_site) & !is.null(input$flow_site)) {
         flows(subset(flows(), site_name == input$flow_site))
-        p_flowrain(generate_rainfall_flow_for_site_plot(flows(), rainfall(), input$start_date, input$end_date))
+        p_flowrain(generate_rainfall_flow_for_site_plot(flows(), rainfall(), input$start_date, input$end_date, flow_thresholds))
       } else{
         p_rainsummary(generate_rainfall_summary_plot(rainfall(), sites))
       }
     })
   })
   
-  output$map <- renderPlotly({
+  output$map <- renderLeaflet({
     map()
   })
   
@@ -280,5 +282,6 @@ server <- function(input, output, session) {
     )
   )
 }
+
 
 shinyApp(ui = ui, server = server)
