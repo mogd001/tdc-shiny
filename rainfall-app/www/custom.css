@@ -1,0 +1,47 @@
+#title-panel {
+    background-color: #273691;
+    color: #ffffff;
+    font-size: 24px;
+    font-style: bold;
+    padding: 10px;
+    text-align: center;
+    margin-top: 0px;
+}
+#sidebar {
+    background-color: #ffffff;
+    border: 1px double #273691;
+    border-radius: 0px;
+    margin-left: 10px;
+}
+#side-bar-title {
+    color: #273691;
+    font-size: 18px;
+}
+#version {
+    color: #273691;
+    font-size: 15px;
+}
+#developed-by {
+    color: #273691;
+    font-size: 12px;
+}
+#main {
+    max-width = 1200px;
+    background-color: #ffffff;
+    border: 1px double #ffffff;
+    border-radius: 0px;
+
+}
+#year_month_title {
+    font-size: 24px;
+    font-style: bold;
+    padding: 10px;
+    text-align: center;
+}
+#mapoutput {
+  height: 800px;
+}
+.container-fluid {
+   padding: 0px;
+   padding-top: 0px;
+}

@@ -1,4 +1,5 @@
 library(shiny)
+library(shinytitle)
 library(leaflet)
 library(tidyverse)
 library(lubridate)
@@ -6,6 +7,7 @@ library(tdcR)
 library(plotly)
 library(shinybusy)
 library(config)
+library(DT)
 
 source("functions.R")
 
@@ -56,14 +58,17 @@ basemap <- function(map_data, longitude, latitude, zoom) {
 
 # Define UI ----
 ui <- fluidPage(
+  title = "Flow App",
+  use_shiny_title(),
+  busy_window_title(),
   tags$head(
     tags$link(rel = "stylesheet", type = "text/css", href = "custom.css")
   ),
-  titlePanel(h1(id = "title-panel", "Flow App"), "Flow App"),
+  h1(id = "title-panel", "Flow App"),
   sidebarLayout(
     sidebarPanel(
       id = "sidebar",
-      span(tags$a(img(src = "tdc_logo.png", width = 250), href = "https://www.tasman.govt.nz/", target = "_blank")),
+      span(tags$a(img(src = "tdc_logo.png", width = "100%"), href = "https://www.tasman.govt.nz/", target = "_blank")),
       br(),
       h3(id = "side-bar-title", "Flow App"),
       em(id = "version", "v0.1"),
@@ -89,7 +94,7 @@ ui <- fluidPage(
         ),
         tabPanel(
           "Table",
-          fluidRow(column(12, tableOutput("table")))
+          fluidRow(column(12, DT::dataTableOutput("table")))
         )
       ),
       add_busy_spinner(spin = "fading-circle"),
@@ -120,8 +125,8 @@ server <- function(input, output, session) {
 
   flow_data <- reactive({
     # return summary data for plotting, update flow data through the process.
-    curr_min_date <- min(flows()$day)
-    curr_max_date <- max(flows()$day)
+    curr_min_date <- min(flows()$date)
+    curr_max_date <- max(flows()$date)
 
     input_start_date <- force_tz(input$start_date, "NZ")
     input_end_date <- force_tz(input$end_date, "NZ")
@@ -180,11 +185,11 @@ server <- function(input, output, session) {
     p <- ggplot(flow_data()$flow) +
       geom_line(aes(datetime, flow_m3ps, color = site_name), alpha = 0.5) +
       theme_bw() +
-      labs(x = "Datetime (NZST)", y = "Flow (m3/s)", color = "Site", title = "Flow Summary")
+      labs(x = "Datetime (NZDT)", y = "Flow (m3/s)", color = "Site", title = "Flow Summary")
     ggplotly(p)
   })
 
-  output$table <- renderTable(flow_data()$summary)
+  output$table <- DT::renderDataTable(flow_data()$summary, pageLength = 100)
 }
 
 

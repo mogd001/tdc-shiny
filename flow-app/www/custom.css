@@ -5,11 +5,13 @@
     font-style: bold;
     padding: 10px;
     text-align: center;
+    margin-top: 0px;
 }
 #sidebar {
     background-color: #ffffff;
     border: 1px double #273691;
     border-radius: 0px;
+    margin-left: 10px;
 }
 #side-bar-title {
     color: #273691;
@@ -38,4 +40,8 @@
 }
 #mapoutput {
   height: 800px;
+}
+.container-fluid {
+   padding: 0px;
+   padding-top: 0px;
 }

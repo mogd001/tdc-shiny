@@ -1,0 +1,13 @@
+name: flow-app
+title: flow-app
+username:
+account: tdc-environmental
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 6633785
+bundleId: 6536720
+url: https://tdc-environmental.shinyapps.io/flow-app/
+when: 1669001427.70702
+lastSyncTime: 1669001427.70703
+asMultiple: FALSE
+asStatic: FALSE

@@ -1,14 +1,17 @@
 library(tdcR)
 library(tidyverse)
+library(lubridate)
 
 get_flows <- function(from = "", to = "Now") {
   get_data_collection(
-    collection = "ActiveFlowSites", method = "Extrema",
-    time_interval = NA, from = from, to = to, interval = "1 hour", alignment = "00:00"
+    collection = "ActiveFlowSites", from = from, to = to
   ) %>%
     rename(flow_m3ps = value) %>%
     group_by(site) %>%
     arrange(datetime) %>%
+    mutate(
+      datetime = with_tz(datetime, tz = "NZ"),
+      date = as.Date(datetime, tz = "Etc/GMT-12")) %>%
     slice(-1) %>%
     ungroup() %>%
     mutate(
