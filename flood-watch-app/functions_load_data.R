@@ -34,3 +34,37 @@ catchment_centroids <- catchments %>% st_centroid(catchments)
 # Rivers
 rivers <- st_read("data/context.gpkg", layer = "rivers") %>%
   st_transform(crs = 4326)
+
+site_names <- sites %>% 
+  select(site, site_name) %>% 
+  st_drop_geometry()
+
+get_flows <- function(from = "", to = "", site_catchment) {
+  get_data_collection(
+    collection = "ActiveFlowSites", from = from, to = to
+  ) %>%
+    rename(flow_m3ps = value) %>%
+    group_by(site) %>%
+    arrange(datetime) %>%
+    ungroup() %>% 
+    mutate(
+      datetime = with_tz(datetime, tz= "NZ")
+    ) %>% 
+    left_join(site_catchment, by = "site")  %>% 
+    left_join(site_names, by = "site") 
+}
+
+get_rainfall <- function(from = "", to = "", site_catchment) {
+  get_data_collection(collection = "AllRainfall", method = "Total", from = from, to = to, interval = "1 hour") %>%
+    rename(rainfall_total_mm = value) %>%
+    group_by(site) %>%
+    arrange(datetime) %>%
+    ungroup() %>%
+    mutate(
+      datetime = with_tz(datetime, tz = "NZ"),
+      rainfall_total_mm = round(rainfall_total_mm, digits = 2)
+    ) %>%
+    filter(!is.na(rainfall_total_mm)) %>% 
+    left_join(site_catchment, by = "site") %>% 
+    left_join(site_names, by = "site")
+}

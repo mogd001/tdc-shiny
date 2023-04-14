@@ -7,8 +7,7 @@ library(shinybusy)
 library(thematic)
 library(lubridate)
 
-source("functions.R")
-source("load_data.R")
+source("functions_load_data.R")
 source("generate_visuals.R")
 
 default_date <- as.Date(now(), tz = "")
@@ -19,7 +18,7 @@ end_date <- default_date
 site_catchment <- select(tibble(sites), c(site, catchment))
 
 flows <- get_flows(format(start_date, "%Y%m%d"), "Now", site_catchment)
-rainfall <- get_rainfall(format(start_date, "%Y%m%d"), "Now", site_catchment)
+rainfall <- get_rainfall(format(start_date, "%Y%m%d"), "Now", site_catchment)  
 
 catchment_names <- levels(sites$catchment)
 flow_sites <- unique(flows$site_name)
