@@ -13,13 +13,14 @@ get_site_data <- function(endpoint = endpoint) {
     )
 }
 
-get_rainfall_monthly_data <- function(endpoint = endpoint, collection = "Rainfall", from = "", to = "", month = "") {
+get_rainfall_monthly_data <- function(endpoint = endpoint, collection = "AllRainfall", from = "", to = "", month = "") {
   get_data_collection(
     endpoint = endpoint, collection = collection, method = "Total", interval = "1 month",
     from = from, to = to
   ) %>%
     rename(rainfall_total = value) %>%
-    mutate(month = month(datetime, label = TRUE)) %>% 
+    mutate(datetime = datetime - months(1),
+           month = month(datetime, label = TRUE)) %>% 
     group_by(site) %>%
     arrange(site, datetime) %>%
     ungroup() %>%
@@ -42,7 +43,7 @@ get_rainfall_data_all_sites <- function(sites, from = "", to = "") {
   mdc_endpoint <- "http://hydro.marlborough.govt.nz/mdc data.hts?"
   wgrc_endpoint <- "http://hilltop.wcrc.govt.nz/Websitedata.hts?"
   
-  month_select <- format(ymd(to), "%b")
+  month_select <- format(ymd(to) - months(1), "%b")
   
   tdc_month_rainfall <- get_rainfall_monthly_data(endpoint = tdc_endpoint, collection = "AllRainfall", from = from, to = to, month = month_select)
   mdc_month_rainfall <- get_rainfall_monthly_data(endpoint = mdc_endpoint, collection = "Rainfall2", from = from, to = to, month = month_select)
