@@ -3,8 +3,10 @@ library(shinyWidgets)
 library(shinytitle)
 library(shinybusy)
 library(leaflet)
+library(leaflet.extras)
 
 source("pre_launch.R")
+
 
 # Define UI ----
 ui <- fluidPage(
@@ -71,16 +73,16 @@ server <- function(input, output, session) {
         data = rivers,
         weight = 1
       ) %>%
-      # add sites
+      # add all sites
       addCircleMarkers(
-        group = "Sites",
-        data = sites,
+        group = "All Sites",
+        data = all_sites,
         radius = 5,
         color = "red",
         stroke = FALSE,
         fillOpacity = 1,
         label = ~ as.character(site),
-        # clusterOptions = markerClusterOptions(removeOutsideVisibleBounds = FALSE),
+        clusterOptions = markerClusterOptions(removeOutsideVisibleBounds = FALSE),
         labelOptions = labelOptions(noHide = FALSE, direction = "auto", style = list(
           "color" = "red",
           "font-family" = "serif",
@@ -90,9 +92,11 @@ server <- function(input, output, session) {
       # Layers control
       addLayersControl(
         baseGroups = c("NZ Topo50", "OSM (default)", "Toner", "Toner Lite"),
-        overlayGroups = c("Catchments", "Rivers", "Sites"),
+        overlayGroups = c("Catchments", "Rivers", "All Sites"),
         options = layersControlOptions(collapsed = TRUE)
-      )
+      ) %>%
+      addResetMapButton() %>%
+      addSearchFeatures(targetGroups = c("All Sites"), options = searchFeaturesOptions(zoom = 18))
   })
 }
 
