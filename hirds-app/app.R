@@ -11,7 +11,7 @@ library(glue)
 
 source("functions.R")
 
-hirds_all <- readRDS("20230510_tdc_site_hird_data.rds")
+hirds_all <- readRDS("20230510_tdc_site_hirds_data.rds")
 
 site_choices <- tibble(site = names(hirds_all)) %>%
   mutate(
